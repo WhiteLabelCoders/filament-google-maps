@@ -162,6 +162,7 @@ export default function filamentGoogleMapsWidget({
         position: point,
         title: label,
         model_id: location.id,
+
         ...(markerIcon && { icon: markerIcon }),
       });
 
@@ -178,9 +179,16 @@ export default function filamentGoogleMapsWidget({
 
         if (this.config.markerAction) {
           google.maps.event.addListener(marker, "click", (event) => {
-            this.$wire.mountAction(this.config.markerAction, {
-              model_id: marker.model_id,
-            });
+            if(location.infoWindow) {
+              this.map.setCenter(marker.getPosition())
+              this.infoWindow.close();
+              this.infoWindow.setContent(location.infoWindow);
+              this.infoWindow.open(marker.getMap(), marker);
+            } else {
+              this.$wire.mountAction(this.config.markerAction, {
+                model_id: marker.model_id,
+              });
+            }
           });
         }
 
